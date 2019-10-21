@@ -5015,6 +5015,8 @@ in {
 
   sphinxcontrib-htmlhelp = callPackage ../development/python-modules/sphinxcontrib-htmlhelp {};
   
+  sphinxcontrib-jsmath = callPackage ../development/python-modules/sphinxcontrib-jsmath {};
+
   sphinxcontrib-bibtex = callPackage ../development/python-modules/sphinxcontrib-bibtex {};
 
   sphinx-navtree = callPackage ../development/python-modules/sphinx-navtree {};
