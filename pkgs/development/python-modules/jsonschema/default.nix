@@ -3,11 +3,11 @@
 
 buildPythonPackage rec {
   pname = "jsonschema";
-  version = "2.6.0";
+  version = "3.1.1";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "00kf3zmpp9ya4sydffpifn0j0mzm342a2vzh82p6r0vh10cg7xbg";
+    sha256 = "2fa0684276b6333ff3c0b1b27081f4b2305f0a36cf702a23db50edb141893c3f";
   };
 
   checkInputs = [ nose mock vcversioner ];
