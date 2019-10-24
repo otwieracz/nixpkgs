@@ -3,11 +3,11 @@
 
 buildPythonPackage rec {
   pname = "portend";
-  version = "2.3";
+  version = "2.5";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "b7ce7d35ea262415297cbfea86226513e77b9ee5f631d3baa11992d663963719";
+    sha256 = "19dc27bfb3c72471bd30a235a4d5fbefef8a7e31cab367744b5d87a205e7bfd9";
   };
 
   postPatch = ''
