@@ -1,5 +1,5 @@
 { stdenv, buildPythonPackage, fetchPypi
-, pytest, setuptools_scm, tempora }:
+, pytest, setuptools_scm, tempora, pytest-black }:
 
 buildPythonPackage rec {
   pname = "portend";
@@ -18,7 +18,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ tempora ];
 
-  checkInputs = [ pytest ];
+  checkInputs = [ pytest pytest-black ];
 
   checkPhase = ''
     py.test --deselect=test_portend.py::TestChecker::test_check_port_listening
