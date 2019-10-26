@@ -2,6 +2,7 @@
 , buildPythonPackage
 , fetchPypi
 , python
+, six
 }:
 
 buildPythonPackage rec {
@@ -12,6 +13,8 @@ buildPythonPackage rec {
     inherit pname version;
     sha256 = "7b11194c414dcf4b9bd8fb5ceaafc9da183b27430883c62f620589eb79b91b6e";
   };
+
+  propagatedBuildInputs = [ six ];
 
   checkPhase = ''
     ${python.interpreter} -m unittest discover -s tests
