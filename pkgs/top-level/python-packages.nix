@@ -1081,6 +1081,8 @@ in {
 
   pytesseract = callPackage ../development/python-modules/pytesseract { };
 
+  pytest-black = callPackage ../development/python-modules/pytest-black { };
+
   pytest-click = callPackage ../development/python-modules/pytest-click { };
 
   pytest-check = callPackage ../development/python-modules/pytest-check { };
