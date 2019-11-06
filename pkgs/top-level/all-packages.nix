@@ -20240,6 +20240,8 @@ in
   rsync = callPackage ../applications/networking/sync/rsync (config.rsync or {});
   rrsync = callPackage ../applications/networking/sync/rsync/rrsync.nix {};
 
+  rsync-bpc = callPackage ../applications/networking/sync/rsync-bpc (config.rsync-boc or {});
+
   rtl_433 = callPackage ../applications/radio/rtl_433 { };
 
   rtl-sdr = callPackage ../applications/radio/rtl-sdr { };

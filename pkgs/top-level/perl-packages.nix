@@ -872,6 +872,19 @@ let
     };
   };
 
+  BackupPCXS = buildPerlPackage rec {
+    pname = "BackupPC-XS";
+    version = "0.59";
+    src = fetchurl {
+      url = "mirror://cpan/authors/id/C/CB/CBARRATT/${pname}-${version}.tar.gz";
+      sha256 = "8a4ddaedcdcbd5993f9343d60de191ac08ee7b71037d15941e8fecaa463fe5e6";
+    };
+    meta = {
+      description = "Perl extension for BackupPC libraries";
+      license = stdenv.lib.licenses.gpl3;
+    };
+  };
+
   BC = buildPerlPackage {
     pname = "B-C";
     version = "1.57";
