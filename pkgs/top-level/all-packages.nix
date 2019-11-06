@@ -1036,6 +1036,8 @@ in
 
   backblaze-b2 = python.pkgs.callPackage ../development/tools/backblaze-b2 { };
 
+  backuppc = callPackage ../applications/backup/backuppc { };
+
   bar = callPackage ../tools/system/bar {};
 
   base16-shell-preview = callPackage ../misc/base16-shell-preview { };
