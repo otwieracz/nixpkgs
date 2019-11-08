@@ -381,8 +381,10 @@ in {
         StateDirectory = "bacula";
       };
       preStart = ''
+        SUDO="${pkgs.sudo}/bin/sudo -u ${config.services.postgresql.superUser}"
+
         if ! test -e "${libDir}/db-created"; then
-            ${pkgs.postgresql}/bin/createuser --no-superuser --no-createdb --no-createrole bacula
+            $SUDO ${pkgs.postgresql}/bin/createuser --no-superuser --no-createdb --no-createrole bacula
             #${pkgs.postgresql}/bin/createdb --owner bacula bacula
 
             # populate DB
