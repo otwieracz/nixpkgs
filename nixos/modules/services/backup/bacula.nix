@@ -373,7 +373,7 @@ in {
       after = [ "network.target" "postgresql.service" ];
       description = "Bacula Director Daemon";
       wantedBy = [ "multi-user.target" ];
-      path = [ pkgs.bacula ];
+      path = [ pkgs.bacula pkgs.su ];
       serviceConfig = {
         ExecStart = "${pkgs.bacula}/sbin/bacula-dir -f -u bacula -g bacula -c ${dir_conf}";
         ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
