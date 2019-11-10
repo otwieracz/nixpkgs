@@ -8,6 +8,21 @@ with lib;
 let
   libDir = "/var/lib/bacula";
 
+
+  boolToYesNo = b: if b then "yes" else "no";
+
+  baculaToString = x: if builtins.typeOf x == "bool"
+                      then boolToString x
+                      else toString x;
+
+  baculaConfig = type: source: name:
+    let section = getAttr name source; in
+    "${type} {\n Name = ${name}\n " + (baculaToString (
+       map
+         (key: "${key} = ${baculaToString (getAttr key section)}\n")
+         (attrNames section)
+    )) + "\n}";
+
   fd_cfg = config.services.bacula-fd;
   fd_conf = pkgs.writeText "bacula-fd.conf"
     ''
@@ -37,36 +52,10 @@ let
   sd_cfg = config.services.bacula-sd;
   sd_conf = pkgs.writeText "bacula-sd.conf" 
     ''
-      Storage {
-        Name = "${sd_cfg.name}";
-        SDPort = ${toString sd_cfg.port};
-        WorkingDirectory = "${libDir}";
-        Pid Directory = "/run";
-        ${sd_cfg.extraStorageConfig}
-      }
- 
-      ${concatStringsSep "\n" (mapAttrsToList (name: value: ''
-      Device {
-        Name = "${name}";
-        Archive Device = "${value.archiveDevice}";
-        Media Type = "${value.mediaType}";
-        ${value.extraDeviceConfig}
-      }
-      '') sd_cfg.device)}
-
-      ${concatStringsSep "\n" (mapAttrsToList (name: value: ''
-      Director {
-        Name = "${name}";
-        Password = "${value.password}";
-        Monitor = "${value.monitor}";
-      }
-      '') sd_cfg.director)}
-
-      Messages {
-        Name = Standard;
-        syslog = all, !skipped, !restored
-        ${sd_cfg.extraMessagesConfig}
-      }
+      ${baculaToString (map (baculaConfig "Storage" sd_cfg.storage) (attrNames sd_cfg.storage))}
+      ${baculaToString (map (baculaConfig "Device" sd_cfg.device) (attrNames sd_cfg.device))}
+      ${baculaToString (map (baculaConfig "Director" sd_cfg.director) (attrNames sd_cfg.director))}
+      ${baculaToString (map (baculaConfig "Messages" sd_cfg.messages) (attrNames sd_cfg.messages))}
     '';
 
   dir_cfg = config.services.bacula-dir;
@@ -220,28 +209,13 @@ in {
           Whether to enable Bacula Storage Daemon.
         '';
       };
- 
-      name = mkOption {
-        default = "${config.networking.hostName}-sd";
-        description = ''
-          Specifies the Name of the Storage daemon.
-        '';
-      };
- 
-      port = mkOption {
-        default = 9103;
-        type = types.int;
-        description = ''
-          Specifies port number on which the Storage daemon listens for Director connections. The default is 9103.
-        '';
-      };
 
       director = mkOption {
         default = {};
         description = ''
           This option defines Director resources in Bacula Storage Daemon.
         '';
-        type = with types; attrsOf (submodule directorOptions);
+        type = with types; attrsOf types.unspecified;
       };
 
       device = mkOption {
@@ -249,30 +223,28 @@ in {
         description = ''
           This option defines Device resources in Bacula Storage Daemon.
         '';
-        type = with types; attrsOf (submodule deviceOptions);
+        type = with types; attrsOf types.unspecified;
       };
  
-      extraStorageConfig = mkOption {
-        default = "";
+      storage = mkOption {
+        default = {};
         description = ''
-          Extra configuration to be passed in Storage directive.
+          This option defines Sevice resources in Bacula Storage Daemon.
         '';
-        example = ''
-          Maximum Concurrent Jobs = 20;
-          Heartbeat Interval = 30;
-        '';
+        type = with types; attrsOf types.unspecified;
       };
 
-      extraMessagesConfig = mkOption {
-        default = "";
+      messages = mkOption {
+        default = { 
+                    Standard = {
+		      syslog = "all, !skipped, !restored";
+                    };
+                  };
         description = ''
-          Extra configuration to be passed in Messages directive.
+          This option defines Messages resources in Bacula Storage Daemon.
         '';
-        example = ''
-          console = all
-        '';
+        type = with types; attrsOf types.unspecified;
       };
- 
     };
 
     services.bacula-dir = {
