@@ -99,12 +99,15 @@ let
       ${baculaToString (map (baculaSection "Client" dir_cfg.client dir_cfg_client_default) (attrNames dir_cfg.client))}
       ${baculaToString (map (baculaSection "Storage" dir_cfg.storage {}) (attrNames dir_cfg.storage))}
       ${baculaToString (map (baculaSection "Pool" dir_cfg.pool {}) (attrNames dir_cfg.pool))}
+      ${baculaToString (map (baculaSection "AutoChanger" dir_cfg.autoChanger {}) (attrNames dir_cfg.autoChanger))}
       ${baculaToString (map (baculaSection "Catalog" dir_cfg.catalog {}) (attrNames dir_cfg.catalog))}
       ${baculaToString (map (baculaSection "Messages" dir_cfg.messages {}) (attrNames dir_cfg.messages))}
       ${baculaToString (map (baculaSection "Console" dir_cfg.console {}) (attrNames dir_cfg.console))}
       ${baculaToString (map (baculaSection "Counter" dir_cfg.counter {}) (attrNames dir_cfg.counter))}
     '';
 in {
+  meta.maintainers = with maintainers; [ otwieracz ];
+
   options = {
     services.bacula-fd = {
       enable = mkOption {
@@ -126,16 +129,26 @@ This way in default way it handles all the permissions and directory creation.
 
       director = mkOption {
         default = {};
+        example = {
+          mybaculadirector = {
+            password = "test";
+          };
+        };
         description = ''
-          This option defines Director resources in Bacula File Daemon.
+          This option defines Director resources in Bacula File Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Client_File_daemon_Configur.html#SECTION002120000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
 
       client = mkOption {
         default = {};
+        example = {
+          MyWorkstation = {
+            FDPort = 9102;
+          };
+        };
         description = ''
-          This option defines Client resources in Bacula File Daemon.
+          This option defines Client resources in Bacula File Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Client_File_daemon_Configur.html#SECTION002110000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
@@ -147,7 +160,7 @@ This way in default way it handles all the permissions and directory creation.
                     };
                   };
         description = ''
-          This option defines Messages resources in Bacula File Daemon.
+          This option defines Messages resources in Bacula File Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Client_File_daemon_Configur.html#SECTION002130000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
@@ -173,24 +186,45 @@ This way in default way it handles all the permissions and directory creation.
 
       director = mkOption {
         default = {};
+        example = {
+          mybaculadirector = {
+            password = "test";
+          };
+        };
         description = ''
-          This option defines Director resources in Bacula Storage Daemon.
+          This option defines Director resources in Bacula Storage Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Storage_Daemon_Configuratio.html#SECTION002220000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
 
       device = mkOption {
         default = {};
+        example = {
+          MyFileStorage = {
+            "Archive Device" = "/backups";
+            "Media Type" = "File";
+            LabelMedia = true;
+            "Random Access" = true;
+            AutomaticMount = true;
+            RemovableMedia = false;
+            AlwaysOpen = false;
+          };
+        };
         description = ''
-          This option defines Device resources in Bacula Storage Daemon.
+          This option defines Device resources in Bacula Storage Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Storage_Daemon_Configuratio.html#SECTION002230000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
  
       storage = mkOption {
         default = { };
+        example = {
+          MyStorage = {
+            SDPort = 9103;
+          };
+        };
         description = ''
-          This option defines Storage resources in Bacula Storage Daemon.
+          This option defines Storage resources in Bacula Storage Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Storage_Daemon_Configuratio.html#SECTION002210000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
@@ -202,7 +236,7 @@ This way in default way it handles all the permissions and directory creation.
                     };
                   };
         description = ''
-          This option defines Messages resources in Bacula Storage Daemon.
+          This option defines Messages resources in Bacula Storage Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Storage_Daemon_Configuratio.html#SECTION002270000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
@@ -228,64 +262,161 @@ This way in default way it handles all the permissions and directory creation.
 
       director = mkOption {
         default = {};
+        example = {
+          mybaculadirector = {
+            DirPort = 9101;
+            password = "test";
+          };
+        };
         description = ''
-          This option defines Director resources in Bacula Director Daemon.
+          This option defines Director resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION002020000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
 
       job = mkOption {
         default = {};
+        example = {
+          BackupLocalFiles = {
+            Type = "Backup";
+            Level = "Incremental";
+            Client = "MyWorkstation";
+            FileSet = "ConfigurationOnly";
+            Pool = "Default";
+            Schedule = "daily";
+          };
+          RestoreLocalFiles = {
+            Type = "Restore";
+            Client = "localhost";
+            FileSet = "ConfigurationOnly";
+            Pool = "Default";
+            Where = "/bacula/restore";
+          };
+        };
         description = ''
-          This option defines Job resources in Bacula Director Daemon.
+          This option defines Job resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION002030000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
 
       jobDefs = mkOption {
         default = {};
+        example = {
+          BackupJobDef = {
+            Type = "Backup";
+            Level = "Incremental";
+            FileSet = "ConfigurationOnly";
+            Pool = "Default";
+            Schedule = "daily";
+          };
+        };
         description = ''
-          This option defines JobDef resources in Bacula Director Daemon.
+          This option defines JobDef resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION002040000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
  
       schedule = mkOption {
         default = {};
+        example = {
+          daily = {
+            Run = [ "level=Full weekly"
+                    "level=Incremental daily at 0:00" ];
+          };
+        };
         description = ''
-          This option defines Schedule resources in Bacula Director Daemon.
+          This option defines Schedule resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION002050000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
  
       fileSet = mkOption {
         default = {};
+        example = {
+          ConfigurationOnly = {
+            Include = {
+              Options = {
+                signature = "MD5";
+                compression = "GZIP";
+              };
+              File = ["/etc" "/root/.config"];
+            };
+            Exclude = {
+              File = "/root/.config/cache";
+            };
+          };
+        };
         description = ''
-          This option defines FileSet resources in Bacula Director Daemon.
+          This option defines FileSet resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION002070000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
  
       client = mkOption {
         default = {};
+        example = {
+          MyWorkstation = {
+            address = "192.168.0.100";
+            password = "test";
+          };
+          localhost = {
+            address = "127.0.0.1";
+            password = "test";
+          };
+        };
         description = ''
-          This option defines Client resources in Bacula Director Daemon.
+          This option defines Client resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION0020130000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
  
       storage = mkOption {
         default = {};
+        example = {
+          File = {
+            Address = "127.0.0.1";
+            SDPort = 9103;
+            password = "test";
+            device = "FileStorage";
+            "Media Type" = "File";
+          };
+        };
         description = ''
-          This option defines Director resources in Bacula Director Daemon.
+          This option defines Director resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION0020140000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
  
+      autoChanger = mkOption {
+        default = {};
+        example = {
+          Default = {
+            "Pool Type" = "Backup";
+            AutoPrune = true;
+            Recycle = true;
+            "Label Format" = "File-";
+            Storage = "File";
+          };
+        };
+        description = ''
+          This option defines AutoChanger resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION0020150000000000000000 for more details.
+        '';
+        type = with types; attrsOf types.unspecified;
+      };
+
       pool = mkOption {
         default = {};
+        example = {
+          Default = {
+            "Pool Type" = "Backup";
+            AutoPrune = true;
+            Recycle = true;
+            "Label Format" = "File-";
+            Storage = "File";
+          };
+        };
         description = ''
-          This option defines Pool resources in Bacula Director Daemon.
+          This option defines Pool resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION0020160000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
@@ -293,7 +424,7 @@ This way in default way it handles all the permissions and directory creation.
       counter = mkOption {
         default = {};
         description = ''
-          This option defines Counter resources in Bacula Director Daemon.
+          This option defines Counter resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION0020200000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
@@ -301,7 +432,7 @@ This way in default way it handles all the permissions and directory creation.
       console = mkOption {
         default = {};
         description = ''
-          This option defines Console resources in Bacula Director Daemon.
+          This option defines Console resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION0020190000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
@@ -314,7 +445,7 @@ This way in default way it handles all the permissions and directory creation.
 		    };
 	          };
         description = ''
-          This option defines Catalog resources in Bacula Director Daemon.
+          This option defines Catalog resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION0020170000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
@@ -325,7 +456,7 @@ This way in default way it handles all the permissions and directory creation.
                     };
                   };
         description = ''
-          This option defines Messages resources in Bacula Director Daemon.
+          This option defines Messages resources in Bacula Director Daemon. See https://www.bacula.org/9.4.x-manuals/en/main/Configuring_Director.html#SECTION0020180000000000000000 for more details.
         '';
         type = with types; attrsOf types.unspecified;
       };
