@@ -13693,7 +13693,6 @@ in
       "--disable-amalgamation"
       "--disable-tcl"
     ];
-    patches = [];
     preConfigure = ''
       echo "D 2019-03-09T15:45:46" > manifest
       echo -n "8250984a368079bb1838d48d99f8c1a6282e00bc" > manifest.uuid

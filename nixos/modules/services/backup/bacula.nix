@@ -63,7 +63,8 @@ let
   };
 
   dir_cfg_job_default = {
-    Messages = "Standard";
+    # Disable this default, as it will conflict with JobDefs
+    # Messages = "Standard";
   };
 
   dir_cfg_jobDefs_default = {
@@ -495,7 +496,7 @@ This way in default way it handles all the permissions and directory creation.
       };
       preStart = ''
         mkdir -p "${sd_cfg.workdir}"
-        chown -R root:bacula "${sd_cfg.workdir}"
+        chown -R bacula:bacula "${sd_cfg.workdir}"
       '';
     };
 
