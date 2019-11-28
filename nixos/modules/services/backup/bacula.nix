@@ -81,7 +81,7 @@ let
     '';
 
   sd_cfg = config.services.bacula-sd;
-  sd_conf = pkgs.writeText "bacula-sd.conf" 
+  sd_conf = pkgs.writeText "bacula-sd.conf"
     ''
       ${baculaToString (map (baculaSection "Storage" sd_cfg.storage sd_cfg_storage_default) (attrNames sd_cfg.storage))}
       ${baculaToString (map (baculaSection "Device" sd_cfg.device {}) (attrNames sd_cfg.device))}
@@ -90,7 +90,7 @@ let
     '';
 
   dir_cfg = config.services.bacula-dir;
-  dir_conf = pkgs.writeText "bacula-dir.conf" 
+  dir_conf = pkgs.writeText "bacula-dir.conf"
     ''
       ${baculaToString (map (baculaSection "Director" dir_cfg.director dir_cfg_director_default) (attrNames dir_cfg.director))}
       ${baculaToString (map (baculaSection "Job" dir_cfg.job dir_cfg_job_default) (attrNames dir_cfg.job))}
@@ -465,14 +465,22 @@ This way in default way it handles all the permissions and directory creation.
     };
   };
 
+
   config = mkIf (fd_cfg.enable || sd_cfg.enable || dir_cfg.enable) {
+    environment.etc."bacula-fd.conf" = {
+      enable = fd_cfg.enable;
+      source = fd_conf;
+    };
+
     systemd.services.bacula-fd = mkIf fd_cfg.enable {
       after = [ "network.target" ];
       description = "Bacula File Daemon";
       wantedBy = [ "multi-user.target" ];
       path = [ pkgs.bacula ];
+      restartTriggers = [ config.environment.etc."bacula-fd.conf".source ];
+      reloadIfChanged = true;
       serviceConfig = {
-        ExecStart = "${pkgs.bacula}/sbin/bacula-fd -f -u root -g bacula -c ${fd_conf}";
+        ExecStart = "${pkgs.bacula}/sbin/bacula-fd -f -u root -g bacula -c /etc/bacula-fd.conf";
         ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
         LogsDirectory = "bacula";
         StateDirectory = "bacula";
@@ -483,13 +491,20 @@ This way in default way it handles all the permissions and directory creation.
       '';
     };
 
+    environment.etc."bacula-sd.conf" = {
+      enable = sd_cfg.enable;
+      source = sd_conf;
+    };
+
     systemd.services.bacula-sd = mkIf sd_cfg.enable {
       after = [ "network.target" ];
       description = "Bacula Storage Daemon";
       wantedBy = [ "multi-user.target" ];
       path = [ pkgs.bacula ];
+      restartTriggers = [ config.environment.etc."bacula-sd.conf".source ];
+      reloadIfChanged = true;
       serviceConfig = {
-        ExecStart = "${pkgs.bacula}/sbin/bacula-sd -f -u bacula -g bacula -c ${sd_conf}";
+        ExecStart = "${pkgs.bacula}/sbin/bacula-sd -f -u bacula -g bacula -c /etc/bacula-sd.conf";
         ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
         LogsDirectory = "bacula";
         StateDirectory = "bacula";
@@ -502,13 +517,20 @@ This way in default way it handles all the permissions and directory creation.
 
     services.postgresql.enable = dir_cfg.enable == true;
 
+    environment.etc."bacula-dir.conf" = {
+      enable = dir_cfg.enable;
+      source = dir_conf;
+    };
+
     systemd.services.bacula-dir = mkIf dir_cfg.enable {
       after = [ "network.target" "postgresql.service" ];
       description = "Bacula Director Daemon";
       wantedBy = [ "multi-user.target" ];
+      restartTriggers = [ config.environment.etc."bacula-dir.conf".source ];
+      reloadIfChanged = true;
       path = [ pkgs.bacula pkgs.su ];
       serviceConfig = {
-        ExecStart = "${pkgs.bacula}/sbin/bacula-dir -f -u bacula -g bacula -c ${dir_conf}";
+        ExecStart = "${pkgs.bacula}/sbin/bacula-dir -f -u bacula -g bacula -c /etc/bacula-dir.conf";
         ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
         LogsDirectory = "bacula";
         StateDirectory = "bacula";
