@@ -2,12 +2,12 @@
 , itsdangerous, click, werkzeug, jinja2, pytest }:
 
 buildPythonPackage rec {
-  version = "1.0.4";
+  version = "1.1.1";
   pname = "Flask";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "ed1330220a321138de53ec7c534c3d90cf2f7af938c7880fc3da13aa46bf870f";
+    sha256 = "0ljdjgyjn7vh8ic1n1dc2l1cl421i6pr3kx5sz2w5irhyfbg3y8k";
   };
 
   checkInputs = [ pytest ];

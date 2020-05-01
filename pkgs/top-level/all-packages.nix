@@ -2122,6 +2122,10 @@ in
 
   burp = callPackage ../tools/backup/burp { };
 
+  burp-ui = callPackage ../tools/backup/burp-ui { 
+    inherit (python3Packages) ;
+  };
+
   buku = callPackage ../applications/misc/buku { };
 
   byzanz = callPackage ../applications/video/byzanz {};

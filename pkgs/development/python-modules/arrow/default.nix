@@ -5,11 +5,11 @@
 
 buildPythonPackage rec {
   pname = "arrow";
-  version = "0.13.2";
+  version = "0.14.2";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "82dd5e13b733787d4eb0fef42d1ee1a99136dc1d65178f70373b3678b3181bfc";
+    sha256 = "1d95wyvhzhqij72ai87p6c0ic4f4c17n2b8gydxzab1wqnj7xgj1";
   };
 
   checkPhase = ''

@@ -3079,6 +3079,8 @@ in {
 
   flask-bootstrap = callPackage ../development/python-modules/flask-bootstrap { };
 
+  flask-bower = callPackage ../development/python-modules/flask-bower { };
+
   flask-caching = callPackage ../development/python-modules/flask-caching { };
 
   flask-common = callPackage ../development/python-modules/flask-common { };
@@ -3114,6 +3116,8 @@ in {
   flask-restplus = callPackage ../development/python-modules/flask-restplus { };
 
   flask_script = callPackage ../development/python-modules/flask-script { };
+
+  flask-session = callPackage ../development/python-modules/flask-session { };
 
   flask-silk = callPackage ../development/python-modules/flask-silk { };
 
@@ -3787,6 +3791,8 @@ in {
   mock-open = callPackage ../development/python-modules/mock-open { };
 
   mockito = callPackage ../development/python-modules/mockito { };
+
+  mockredispy = callPackage ../development/python-modules/mockredispy { };
 
   modeled = callPackage ../development/python-modules/modeled { };
 
